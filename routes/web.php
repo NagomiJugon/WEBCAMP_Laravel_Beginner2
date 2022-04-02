@@ -20,5 +20,5 @@ Route::get('/', function () {
 });
 */
 
-Route::get( '/' , [WelcomeController::class , 'index' ] );
+Route::get( '/welcome' , [WelcomeController::class , 'index' ] );
 Route::get( '/welcome/second' , [ WelcomeController::class , 'second' ] );
