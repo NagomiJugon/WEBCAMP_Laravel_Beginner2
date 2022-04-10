@@ -36,54 +36,20 @@
         <th>期限</th>
         <th>重要度</th>
       </tr>
-      <tr>
-        <td>HTML formの学習</td>
-        <td>2022/01/01</td>
-        <td>普通</td>
-        <td><a href="./detail.html">詳細閲覧</a></td>
-        <td><a href="./edit.html">編集</a></td>
-        <td>
-          <form action="./top.html" method="post">
-            <button>完了</button>
-          </form>
-        </td>
-      </tr>
-      <tr>
-        <td>PHPの学習</td>
-        <td>2022/01/15</td>
-        <td>普通</td>
-        <td><a href="./detail.html">詳細閲覧</a></td>
-        <td><a href="./edit.html">編集</a></td>
-        <td>
-          <form action="./top.html">
-            <button>完了</button>
-          </form>
-        </td>
-      </tr>
-      <tr>
-        <td>RDBの学習</td>
-        <td>2022/02/01</td>
-        <td>普通</td>
-        <td><a href="./detail.html">詳細閲覧</a></td>
-        <td><a href="../edit.html">編集</a></td>
-        <td>
-          <form action="./top.html">
-            <button>完了</button>
-          </form>
-        </td>
-      </tr>
-      <tr>
-        <td>Laravelの学習</td>
-        <td>2022/02/15</td>
-        <td>普通</td>
-        <td><a href="./detail.html">詳細閲覧</a></td>
-        <td><a href="./edit.html">編集</a></td>
-        <td>
-          <form action="./top.html">
-            <button>完了</button>
-          </form>
-        </td>
-      </tr>
+      @foreach ( $list as $task )
+        <tr>
+          <td>{{ $task->name }}</td>
+          <td>{{ $task->period }}</td>
+          <td>{{ $task->getPriorityString() }}</td>
+          <td><a href="./detail.html">詳細閲覧</a></td>
+          <td><a href="./edit.html">編集</a></td>
+          <td>
+            <form action="./top.html">
+              <button>完了</button>
+            </form>
+          </td>
+        </tr>
+      @endforeach
     </table>
 
     <!-- ページネーション -->
