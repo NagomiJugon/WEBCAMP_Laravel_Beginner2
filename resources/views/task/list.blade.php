@@ -41,7 +41,7 @@
           <td>{{ $task->name }}</td>
           <td>{{ $task->period }}</td>
           <td>{{ $task->getPriorityString() }}</td>
-          <td><a href="./detail.html">詳細閲覧</a></td>
+          <td><a href="{{ route( 'detail' , [ 'task_id' => $task->id ] ) }}">詳細閲覧</a></td>
           <td><a href="./edit.html">編集</a></td>
           <td>
             <form action="./top.html">
