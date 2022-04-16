@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TaskRegisterPostRequest;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Task as TaskModel;
+use Illuminate\Support\Facades\DB;
+use App\Models\CompletedTask as CompletedTaskModel;
 
 class TaskController extends Controller {
     /**
@@ -145,4 +148,64 @@ class TaskController extends Controller {
         return $task;
     }
     
+    /**
+     * 削除処理
+     */
+    public function delete( Request $request , $task_id ) {
+        // task_idのレコードを取得する
+        $task = $this->getTaskModel( $task_id );
+        
+        // タスクを削除する
+        if ( $task !== null ) {
+            $task->delete();
+            $request->session()->flash( 'front.task_delete_success' , true );
+        }
+        
+        // 一覧に遷移する
+        return redirect( '/task/list' );
+    }
+    
+    /**
+     * タスクの完了
+     */
+    public function complete( Request $request , $task_id ) {
+        /* タスクを完了テーブルに移動させる */
+        try {
+            // トランザクション開始
+            DB::beginTransaction();
+            
+            // task_idのレコードを取得する
+            $task = $this->getTaskModel( $task_id );
+            if ( $task === null ) {
+                // task_idが不正なのでトランザクション終了
+                throw new \Exception( '' );
+            }
+            // tasks側を削除する
+            $task->delete();
+            // completed_tasks側にinsertする
+            $task_datum = $task->toArray();
+            unset( $task_datum[ 'created_at' ] );
+            unset( $task_datum[ 'updated_at' ] );
+            $r = CompletedTaskModel::create( $task_datum );
+            if ( $r === null ) {
+                // insertで失敗した場合はトランザクション終了
+                // create()の返り値は作成したレコードのobject
+                throw new \Exception( '' );
+            }
+            
+            // トランザクション終了
+            DB::commit();
+            // 完了メッセージ
+            $request->session()->flash( 'front.task_completed_success' , true );
+            
+        } catch ( \Throwable $e ) {
+            // トランザクション異常終了
+            DB::rollback();
+            // 失敗メッセージ
+            $request->session()->flash( 'front.task_completed_failure' , true );
+        }
+        
+        // 一覧に遷移する
+        return redirect( '/task/list' );
+    }
 }
