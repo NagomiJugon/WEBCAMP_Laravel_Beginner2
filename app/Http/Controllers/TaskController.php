@@ -22,11 +22,7 @@ class TaskController extends Controller {
         $per_page = 2;
         
         // 一覧の取得
-        $list = TaskModel::where( 'user_id' , Auth::id() ) 
-            ->orderBy( 'priority' , 'DESC' )
-            ->orderBy( 'period' )
-            ->orderBy( 'created_at' )
-            ->paginate( $per_page );
+        $list = $this->getListBuilder()->paginate( $per_page );
             //->get();
         /*
         $sql = TaskModel::where( 'user_id' , Auth::id() )
@@ -207,5 +203,70 @@ class TaskController extends Controller {
         
         // 一覧に遷移する
         return redirect( '/task/list' );
+    }
+    
+    /**
+     * CSVダウンロード
+     */
+    public function csvDownload() {
+        /* 「ダウンロードさせたいCSV」を作成する */
+        $data_list = [
+            'id' => 'タスクID',
+            'name' => 'タスク名',
+            'priority' => '重要度',
+            'period' => '期限',
+            'detail' => 'タスク詳細',
+            'created_at' => 'タスク作成日',
+            'updated_at' => 'タスク修正日',
+        ];
+        
+        // データを取得する
+        $list = $this->getListBuilder()->get();
+        
+        // バッファリングを開始
+        ob_start();
+        
+        // 「書き込み先を"出力"にした」ファイルハンドリングを作成する
+        $file = new \SplFileObject( 'php://output' , 'w' );
+        // ヘッダを書き込む
+        $file->fputcsv( array_values( $data_list ) );
+        // CSVをファイルに書き込む(出力する)
+        foreach ( $list as $datum ) {
+            $awk = []; // 作業領域の確保
+            // $data_listに書いてかる順番に、書いてある要素だけを$awkに格納する
+            foreach ( $data_list as $k => $v ) {
+                if ( $k === 'priority' ) {
+                    $awk[] = $datum->getPriorityString();
+                } else {
+                    $awk[] = $datum->$k;
+                }
+                
+            }
+            // CSVの一行を出力
+            $file->fputcsv( $awk );
+        }
+        
+        // 現在のバッファの中身を取得し、出力バッファを削除する
+        $csv_string = ob_get_clean();
+        
+        // 文字コードを変換する
+        $csv_string_sjis = mb_convert_encoding( $csv_string , 'SJIS' , 'UTF-8' );
+        
+        // ダウンロードファイル名の作成
+        $download_filename = 'task_list.' . date( 'Ymd' ) . '.csv';
+        // CSVを出力する
+        return response( $csv_string_sjis )
+            ->header( 'Content-type' , 'text/csv' )
+            ->header( 'Content-Disposition' , 'attachment; filename="' . $download_filename . '"' );
+    }
+    
+    /**
+     * 一覧用の Illuminate\Database\Eloquent\Builder インスタンスの取得
+     */
+    protected function getListBuilder() {
+        return TaskModel::where( 'user_id' , Auth::id() )
+            ->orderBy( 'priority' , 'DESC' )
+            ->orderBy( 'period' )
+            ->orderBy( 'created_at' );
     }
 }
