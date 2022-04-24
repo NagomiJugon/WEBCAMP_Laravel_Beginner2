@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\CompletedTaskController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\HomeController as AdminHomeController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
@@ -50,6 +51,12 @@ Route::prefix( '/admin' )->group( function () {
     Route::get( '/user/list' , [ AdminUserController::class, 'list' ] )->name( 'admin.user.list' );
   });
   Route::get( '/logout' , [ AdminAuthController::class , 'logout' ] );
+});
+
+// ユーザー関連
+Route::prefix( '/user' )->group( function () {
+  Route::get( '/index' , [ UserController::class , 'index' ] );
+  Route::post( '/register' , [ UserController::class , 'register' ] );
 });
 
 // テスト用
