@@ -5,6 +5,7 @@ use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TestController;
+use App\Http\Controllers\CompletedTaskController;
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\HomeController as AdminHomeController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
@@ -37,6 +38,7 @@ Route::middleware([ 'auth' ])->group( function() {
   });
   //
   Route::get( '/logout' , [ AuthController::class , 'logout' ] );
+  Route::get( '/completed_tasks/list' , [ CompletedTaskController::class , 'completed_list' ] )->name( 'completed.list' );
 });
 
 // 管理画面
