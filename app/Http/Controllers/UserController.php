@@ -32,7 +32,7 @@ class UserController extends Controller
     } catch (\Throwable $e ) {
       // ユーザー登録失敗時
       $request->session()->flash( 'front.user_register_failure' , true );
-      return redirect( route( 'fornt.index' ) );
+      return redirect( route( 'front.index' ) );
     }
     
     // ユーザー登録成功時
